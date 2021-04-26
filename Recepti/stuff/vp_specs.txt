@@ -1,0 +1,23 @@
+
+ == VP Proekt - Strana za recepti
+	- login / register
+	- crud operations
+	- navbar so linkovi
+	- main page
+		+ recent posts
+		+ most active
+		+ top posts
+		+ sort by: type
+	- user profile
+	- admin panel
+		+ list all users
+		+ list all posts
+		+ list posts by user
+	- roles: USER, ADMIN, MOD
+	
+	
+ == Libraries
+	- Bootstrap
+	- jQuery
+	- Tabulator
+	- 

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <script src="jquery-3.6.0.js"></script>
+
+    <link rel="stylesheet" href="bootstrap-4.0.0/dist/css/bootstrap-reboot.min.css">
+    <link rel="stylesheet" href="bootstrap-4.0.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap-4.0.0/dist/css/bootstrap-grid.min.css">
+    <script src="bootstrap-4.0.0/dist/js/bootstrap.min.js"></script>
+    <script src="bootstrap-4.0.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <link rel="stylesheet" href="datatables/datatables.min.css">
+    <script src="datatables/datatables.min.js"></script>
+
+    <!-- <link rel="stylesheet" href="quill/quill.snow.css">
+    <script src="quill/quill.min.js"></script>
+
+    <script src="vue.js"></script> -->
+    <title>USER_NAME's Profile - Recepti</title>
+</head>
+
+<body class="container-flex">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" th:href="@{/}">Рецепти</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/create}">Објави рецепт</a>
+                </li>
+            </ul>
+            <div class="form-inline my-2 my-lg-0">
+                <th:block th:if="${#request.getRemoteUser() != null}">
+                    <a th:href="@{'/profile?' (username=${#request.getRemoteUser()})}" class="btn btn-outline-success my-2 my-sm-0" th:text="${#request.getRemoteUser()}"></a>
+                    <a th:href="@{/logout}" class="btn btn-outline-danger my-2 my-sm-0">Logout</a>
+                </th:block>
+                <th:block th:if="${#request.getRemoteUser() == null}">
+                    <a th:href="@{/login}" class="btn btn-outline-success my-2 my-sm-0">Login</a>
+                    <a th:href="@{/register}" class="btn btn-outline-success my-2 my-sm-0">Register</a>
+                </th:block>
+            </div>
+        </div>
+    </nav>
+    <!-- ########################################################## -->
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-left">
+                <h1><span id="username" th:text="${username}"></span><span>'s Profile</span></h1>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-12">
+                <a th:href="@{'/profile?' (username=${username})}" class="btn btn-outline-success">Постирани рецепти</a>
+                <a th:href="@{'/profileLiked?' (username=${username})}" class="btn btn-outline-success">Омилени рецепти</a>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-12">
+                <table id="dataTable">
+                    <thead>
+                        <th></th>
+                        <th>Име</th>
+                        <th>Категорија</th>
+                    </thead>
+                    <tbody>
+                        <th:block th:each="item: ${postedRecipes}">
+                            <tr>
+<!--                                <td><a th:href="@{'/r?'(id=${item.getId()})}" th:text="${item.getName()}"></a></td>-->
+<!--                                <td th:text="${item.getAmenity()}"></td>-->
+<!--                                <td th:text='${item.getCuisine().replaceAll(";", ", ").replaceAll("_", " ")}' id="cuisine"></td>-->
+
+                                <td>
+                                    <a th:href="@{'/r?' (id=${item.getId()})}">
+                                        <img th:src="${item.getLinkSlika()}" alt="image" style="width: 150px;">
+                                    </a>
+                                </td>
+                                <td th:text="${item.getIme()}"></td>
+                                <td th:text="${item.getKategorija()}"></td>
+                            </tr>
+                        </th:block>
+<!--                        <tr>-->
+<!--                            <td>-->
+<!--                                <img src="no-image.jpg" alt="image" style="width: 150px;">-->
+<!--                            </td>-->
+<!--                            <td>IME_RECEPT</td>-->
+<!--                            <td>KATEGORIJA</td>-->
+<!--                        </tr>-->
+<!--                        <tr>-->
+<!--                            <td>-->
+<!--                                <img src="no-image.jpg" alt="image" style="width: 150px;">-->
+<!--                            </td>-->
+<!--                            <td>IMEw_RECEPT</td>-->
+<!--                            <td>KATEGORIJA</td>-->
+<!--                        </tr>-->
+<!--                        <tr>-->
+<!--                            <td>-->
+<!--                                <img src="no-image.jpg" alt="image" style="width: 150px;">-->
+<!--                            </td>-->
+<!--                            <td>IME23_RECEPT</td>-->
+<!--                            <td>KATEGORIJA</td>-->
+<!--                        </tr>-->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.title = document.getElementById("username").innerText + "'s Profile - Recepti";
+        $('#dataTable').DataTable({
+            "columnDefs": [{
+                "targets": 0,
+                "orderable": false
+            }]
+        });
+    </script>
+</body>
+</html>

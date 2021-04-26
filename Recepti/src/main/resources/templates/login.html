@@ -1,0 +1,94 @@
+<!--<html>-->
+
+<!--<head>Login</head>-->
+
+<!--<body>-->
+<!--  <h1>Login</h1>-->
+<!--  <form name='f' action="login" method='POST'>-->
+<!--    <table>-->
+<!--      <tr>-->
+<!--        <td>User:</td>-->
+<!--        <td><input type='text' name='username' value=''></td>-->
+<!--      </tr>-->
+<!--      <tr>-->
+<!--        <td>Password:</td>-->
+<!--        <td><input type='password' name='password' /></td>-->
+<!--      </tr>-->
+<!--      <tr>-->
+<!--        <td><input name="submit" type="submit" value="Логирај се" /></td>-->
+<!--      </tr>-->
+<!--    </table>-->
+<!--  </form>-->
+<!--</body>-->
+
+<!--</html>-->
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org/">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <script src="jquery-3.6.0.js"></script>
+
+  <link rel="stylesheet" href="bootstrap-4.0.0/dist/css/bootstrap-reboot.min.css">
+  <link rel="stylesheet" href="bootstrap-4.0.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="bootstrap-4.0.0/dist/css/bootstrap-grid.min.css">
+  <script src="bootstrap-4.0.0/dist/js/bootstrap.min.js"></script>
+  <script src="bootstrap-4.0.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <title>Register - Recepti</title>
+</head>
+
+<body class="container-flex">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" th:href="@{/}">Рецепти</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" th:href="@{/create}">Објави рецепт</a>
+        </li>
+      </ul>
+      <div class="form-inline my-2 my-lg-0">
+        <th:block th:if="${#request.getRemoteUser() != null}">
+                    <a th:href="@{'/profile?' (username=${#request.getRemoteUser()})}" class="btn btn-outline-success my-2 my-sm-0" th:text="${#request.getRemoteUser()}"></a>
+                    <a th:href="@{/logout}" class="btn btn-outline-danger my-2 my-sm-0">Logout</a>
+                </th:block>
+                <th:block th:if="${#request.getRemoteUser() == null}">
+                    <a th:href="@{/login}" class="btn btn-outline-success my-2 my-sm-0">Login</a>
+                    <a th:href="@{/register}" class="btn btn-outline-success my-2 my-sm-0">Register</a>
+                </th:block>
+            </div>
+        </div>
+    </nav>
+    <!-- ########################################################## -->
+    <div class="container">
+        <div class="row">
+            <div class="col-12 d-flex justify-content-center mt-3">
+              <form name='f' action="login" method='POST'>
+                    <div class="form-group">
+                        <label for="username">Корисничко име</label>
+                        <input class="form-control" type="text" name="username" id="username">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Лозинка</label>
+                        <input class="form-control" type="password" name="password" id="password">
+                    </div>
+                    <div class="form-group">
+                      <input name="submit" type="submit" value="Логирај се" class="btn btn-success" />
+                  </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="passToVue" style="display: none" th:username="${username}" th:password="${password}" th:email="${email}" th:birthdate="${birthdate}"></div>
+</body>
+
+
+</html>

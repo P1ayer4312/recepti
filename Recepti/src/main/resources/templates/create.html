@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <script src="/jquery-3.6.0.js"></script>
+
+    <link rel="stylesheet" href="/bootstrap-4.0.0/dist/css/bootstrap-reboot.min.css">
+    <link rel="stylesheet" href="/bootstrap-4.0.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/bootstrap-4.0.0/dist/css/bootstrap-grid.min.css">
+    <script src="/bootstrap-4.0.0/dist/js/bootstrap.min.js"></script>
+    <script src="/bootstrap-4.0.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <link rel="stylesheet" href="/quill/quill.snow.css">
+    <script src="/quill/quill.min.js"></script>
+
+    <script src="/vue.js"></script>
+    <title>Create - Recepti</title>
+</head>
+
+<body class="container-flex">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" th:href="@{/}">Рецепти</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/create}">Објави рецепт</a>
+                </li>
+            </ul>
+            <div class="form-inline my-2 my-lg-0">
+                <th:block th:if="${#request.getRemoteUser() != null}">
+                    <a th:href="@{'/profile?' (username=${#request.getRemoteUser()})}" class="btn btn-outline-success my-2 my-sm-0" th:text="${#request.getRemoteUser()}"></a>
+                    <a th:href="@{/logout}" class="btn btn-outline-danger my-2 my-sm-0">Logout</a>
+                </th:block>
+                <th:block th:if="${#request.getRemoteUser() == null}">
+                    <a th:href="@{/login}" class="btn btn-outline-success my-2 my-sm-0">Login</a>
+                    <a th:href="@{/register}" class="btn btn-outline-success my-2 my-sm-0">Register</a>
+                </th:block>
+            </div>
+        </div>
+    </nav>
+
+
+    <div class="container">
+        <div id="vuePart" class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label for="recipeName">Име на рецептот</label>
+                    <input type="text" class="form-control" v-model="recipeName" name="recipeName" id="recipeName">
+                </div><br>
+
+                <div class="form-group">
+                    <label for="recipeType">Категорија</label>
+                    <select name="recipeType" id="recipeType" v-model="recipeType" class="custom-select">
+                        <option value="" disabled selected>-- Изберете --</option>
+                        <option value="POJADOK">Појадок</option>
+                        <option value="RUCEK">Ручек</option>
+                        <option value="VECERA">Вечера</option>
+                        <option value="DESERT">Десерт</option>
+                    </select>
+                </div><br>
+
+                <div class="form-group">
+                    <label for="recipeTime">Време за изработка (во минути)</label>
+                    <input type="number" name="recipeTime" id="recipeTime" v-model="recipeTime" class="form-control">
+                </div><br>
+
+                <div class="form-group">
+                    <label for="recipeImage">Линк од слика</label>
+                    <input class="form-control" type="url" name="recipeImage" id="recipeImage" v-model="recipeImage">
+                    <div style="color: red; display: none;" id="imgCheck">Внесете валиден линк од слика</div>
+                </div><br>
+
+                <div class="form-group">
+                    <label for="recipeItem">Состојки</label>
+                    <div class="form-row">
+                        <div class="form-group col-10">
+                            <input class="form-control" type="text" name="recipeItem" id="recipeItem"
+                                @keyup.enter="addItem">
+                        </div>
+                        <div class="form-group col-1">
+                            <button @click="addItem" class="btn btn-primary">Додади</button>
+                        </div>
+                    </div>
+
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item" v-for="(item, index) in recipeItems" :id="index">
+                            <button class="btn btn-danger" @click="deleteItem" :id="index">Избриши</button>
+                            <span>{{item}}</span>
+                        </li>
+                    </ul>
+                </div><br>
+            </div>
+            <div class="col align-content-center">
+                <div class="row">
+                    <img :src="[recipeImage === '' ? '/no-image.jpg' : recipeImage ]" onerror="vue.clearBadLink()" alt=""
+                        style="width: 100%; margin-top: 10px;">
+                </div>
+                <div class="row">
+                    <button class="btn btn-success mx-5" style="width: 100%; margin-top: 30px;"
+                        @click="submitForm">Објави нов рецепт</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="container" style="height: 300px">
+        <div id="quillEditor"></div>
+    </div>
+
+    <th:block th:if="${!edit}">
+        <form th:method="POST" th:action="@{/create}" style="display: none; visibility: hidden">
+            <input type="text" name="rName" id="rName">
+            <input type="text" name="rType" id="rType">
+            <input type="number" name="rTime" id="rTime">
+            <input type="text" name="rItems" id="rItems">
+            <input type="text" name="rImage" id="rImage">
+            <input type="text" name="rText" id="rText">
+            <input type="submit" value="sub" id="submitButton">
+        </form>
+    </th:block>
+
+    <th:block th:if="${edit}">
+        <form th:method="POST" th:action="@{/edit}" style="display: none; visibility: hidden">
+            <input type="text" name="rName" id="rName" th:value="${rName}">
+            <input type="text" name="rType" id="rType" th:value="${rType}">
+            <input type="number" name="rTime" id="rTime" th:value="${rTime}">
+            <input type="text" name="rItems" id="rItems" th:value="${rItems}">
+            <input type="text" name="rImage" id="rImage" th:value="${rImage}">
+            <input type="text" name="rText" id="rText"  th:value="${rText}">
+            <input type="submit" value="sub" id="submitButton">
+            <input type="number" name="rId" th:value="${rId}">
+            <span id="edit"></span>
+        </form>
+    </th:block>
+</body>
+
+<script>
+    var quill = new Quill('#quillEditor', {
+        theme: 'snow'
+    });
+    var invalidImage = document;
+    var vue = new Vue({
+        el: '#vuePart',
+        data: {
+            recipeName: "",
+            recipeType: "",
+            recipeTextJSON: "",
+            recipeTime: 0,
+            recipeItems: [],
+            recipeImage: ""
+        },
+        methods: {
+            submitForm: function () {
+                document.getElementById("rName").value = this.recipeName;
+                document.getElementById("rType").value = this.recipeType;
+                document.getElementById("rTime").value = this.recipeTime;
+                document.getElementById("rItems").value = this.recipeItems.join(';');
+                document.getElementById("rImage").value = this.recipeImage;
+                document.getElementById("rText").value = JSON.stringify(quill.getContents());
+                document.getElementById("submitButton").click();
+            },
+            addItem: function () {
+                let inputItem = document.getElementById('recipeItem');
+                if (inputItem.value == '') return;
+                this.recipeItems.push(inputItem.value);
+                inputItem.value = "";
+            },
+            deleteItem: function ($event) {
+                // console.log($event.target.getAttribute('id'))
+                this.recipeItems.splice(parseInt($event.target.getAttribute('id')), 1);
+            },
+            clearBadLink: function () {
+                this.recipeImage = '';
+                document.getElementById('imgCheck').style.removeProperty('display');
+            }
+        },
+        watch: {
+            recipeImage: function() {
+                if (this.recipeImage == '') {
+                    document.getElementById('imgCheck').style.removeProperty('display');
+                }
+                else {
+                    document.getElementById('imgCheck').style.setProperty('display', 'none');
+                }
+            }
+        }
+    });
+
+    if (document.getElementById('edit') !== null) {
+        vue.recipeName = document.getElementById("rName").value;
+        vue.recipeType = document.getElementById("rType").value;
+        vue.recipeTime = document.getElementById("rTime").value;
+        vue.recipeItems = document.getElementById("rItems").value.split(';');
+        vue.recipeImage = document.getElementById("rImage").value;
+        quill.setContents(JSON.parse(document.getElementById("rText").value));
+    }
+</script>
+
+</html>

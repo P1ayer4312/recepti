@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <style>
+        .ql-toolbar {
+            display: none;
+        }
+        #quillEditor {
+            border: none;
+        }
+    </style>
+    <script src="jquery-3.6.0.js"></script>
+
+    <link rel="stylesheet" href="bootstrap-4.0.0/dist/css/bootstrap-reboot.min.css">
+    <link rel="stylesheet" href="bootstrap-4.0.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap-4.0.0/dist/css/bootstrap-grid.min.css">
+    <script src="bootstrap-4.0.0/dist/js/bootstrap.min.js"></script>
+    <script src="bootstrap-4.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="quill/quill.snow.css">
+
+    <script src="quill/quill.min.js"></script>
+
+    <script src="bootbox/bootbox.all.min.js"></script>
+
+    <!-- 
+    <script src="vue.js"></script> -->
+    <title>IME_NA_RECEPT - Recepti</title>
+</head>
+
+<body class="container-flex">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" th:href="@{/}">Рецепти</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/create}">Објави рецепт</a>
+                </li>
+            </ul>
+            <div class="form-inline my-2 my-lg-0">
+                <th:block th:if="${#request.getRemoteUser() != null}">
+                    <a th:href="@{'/profile?' (username=${#request.getRemoteUser()})}" class="btn btn-outline-success my-2 my-sm-0" th:text="${#request.getRemoteUser()}"></a>
+                    <a th:href="@{/logout}" class="btn btn-outline-danger my-2 my-sm-0">Logout</a>
+                </th:block>
+                <th:block th:if="${#request.getRemoteUser() == null}">
+                    <a th:href="@{/login}" class="btn btn-outline-success my-2 my-sm-0">Login</a>
+                    <a th:href="@{/register}" class="btn btn-outline-success my-2 my-sm-0">Register</a>
+                </th:block>
+            </div>
+        </div>
+    </nav>
+    <!-- ########################################################## -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 col-sm-6">
+                <h1 th:text="${recipe.getIme()}"></h1>
+                <img th:src="${recipe.getLinkSlika()}" alt="" style="width: 100%;">
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <div class="mt-5">
+                    <h5>Состојки</h5>
+                    <ul class="list-group list-group-flush" id="sostojki">
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-8 col-sm-6">
+                <div id="quillEditor">
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 mb-4">
+                <div class="row mb-4">
+                    <div class="col">
+                        <h5>Објавено од: </h5><a th:href="@{'/profile?' (username=${recipe.getCreator()})}"><span th:text="${recipe.getCreator()}"></span></a>
+                    </div>
+                </div>
+                <div class="row">
+                    <th:block th:if="${creator}">
+                        <div class="col">
+                            <a th:href="@{'/edit?' (id=${recipe.getId()})}" class="btn btn-primary">Промени</a>
+                            <button class="btn btn-danger" onclick="deletePrompt()">Избриши</button>
+                        </div>
+                    </th:block>
+                    <form th:method="POST" th:action="@{'/like?' (id=${recipe.getId()})}">
+                        <input class="btn btn-warning" type="submit" value="Like">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <p id="passToQuill" th:text="${recipe.getTekst()}" style="display: none; visibility: hidden"></p>
+    <p id="passToSostojki" th:text="${recipe.getSostojki()}" style="display: none; visibility: hidden"></p>
+    <form th:method="POST" th:action="@{/r}" style="display: none; visibility: hidden">
+        <input type="number" name="id" th:value="${recipe.getId()}">
+        <input type="submit" id="removeRecipe">
+    </form>
+</body>
+<script>
+    var quill = new Quill('#quillEditor', {
+        theme: 'snow',
+        readOnly: true
+    });
+
+    quill.setContents(JSON.parse(document.getElementById("passToQuill").innerText));
+    let sostojki = document.getElementById("sostojki");
+    document.getElementById("passToSostojki").innerText.split(';')
+        .map(e => sostojki.innerHTML += "<li class=\"list-group-item\">" + e + "</li>");
+
+    function deletePrompt() {
+        bootbox.confirm({
+            message: "Дали сте сигурни дека сакате да го избришете рецептот?",
+            buttons: {
+                confirm: {
+                    label: 'Да',
+                    className: 'btn-danger'
+                },
+                cancel: {
+                    label: 'Не',
+                    className: 'btn-warning'
+                }
+            },
+            backdrop: true,
+            callback: function (result) {
+                // console.log('This was logged in the callback: ' + result);
+                if (result) {
+                    document.getElementById("removeRecipe").click();
+                }
+            }
+        });
+    }
+</script>
+
+</html>
